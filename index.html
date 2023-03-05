@@ -24,26 +24,120 @@
 		const canvas = document.getElementById("myCanvas");
 		const ctx = canvas.getContext("2d");
 
-		// make red box
-		ctx.beginPath();
-		ctx.rect(20, 40, 50, 50);
-		ctx.fillStyle = "#FF0000";
-		ctx.fill();
-		ctx.closePath();
+        // Ball Variables
+        let x = canvas.width / 2;
+        let y = canvas.height - 30;
+        let dx = 2;
+        let dy = -2;
+        const ballRadius = 10;
 
-		// make green circle
-		ctx.beginPath();
-		ctx.arc(240, 160, 20, 0, Math.PI * 2, false);
-		ctx.fillStyle = "green";
-		ctx.fill();
-		ctx.closePath();
+        // Paddle Variables
+        const paddleHeight = 10;
+        const paddleWidth = 75;
+        let paddleX = (canvas.width - paddleWidth) / 2;
+        let paddleSpeed = 7;
+        let spinRate = 0.2;
+        let graceHeight = 10;
 
-		// make unfilled semitransparent rectangle
-		ctx.beginPath();
-		ctx.rect(160, 10, 100, 40);
-		ctx.strokeStyle = "rgba(0, 0, 255, 0.5)";
-		ctx.stroke();
-		ctx.closePath();
+        // Input Variables
+        let rightPressed = false;
+        let leftPressed = false;
+
+        // Input Functions
+        function keyDownHandler(e) {
+            if (e.key === "Right" || e.key === "ArrowRight") {
+                rightPressed = true;
+            } else if (e.key === "Left" || e.key === "ArrowLeft") {
+                leftPressed = true;
+            }
+        }
+
+        function keyUpHandler(e) {
+            if (e.key === "Right" || e.key === "ArrowRight") {
+                rightPressed = false;
+            } else if (e.key === "Left" || e.key === "ArrowLeft") {
+                leftPressed = false;
+            }
+        }
+
+
+        // Drawing Functions
+        function drawBall() {
+            // Draw Ball
+            ctx.beginPath();
+            ctx.arc(x, y, ballRadius, 0, Math.PI * 2);
+            ctx.fillStyle = "#0095DD";
+            ctx.fill();
+            ctx.closePath();
+        }
+
+        function drawPaddle() {
+            ctx.beginPath();
+            ctx.rect(paddleX, canvas.height - paddleHeight, paddleWidth, paddleHeight);
+            ctx.fillStyle = "#0095DD";
+            ctx.fill();
+            ctx.closePath();
+        }
+
+        function moveBall() {
+            if (x + dx > canvas.width - ballRadius || x + dx < ballRadius) {
+                dx = -dx;
+            }
+            if (y + dy < ballRadius) {
+                dy = -dy;
+            }
+            if (x > paddleX && x < paddleX + paddleWidth) {
+                if (y + dy > canvas.height - ballRadius - paddleHeight && dy > 0) {
+                    dy = -dy;
+                }
+            }
+             if (y + dy > canvas.height - ballRadius + graceHeight) {
+                alert("GAME OVER");
+                document.location.reload();
+                clearInterval(interval);
+            }
+            x += dx;
+            y += dy;
+
+        }
+
+        function addSpin() {
+            // Check if ball is touching paddle
+            if (y + dy > canvas.height - ballRadius - paddleHeight) {
+                if (x > paddleX && x < paddleX + paddleWidth) {
+                    // If paddle is moving, change horizontal speed of ball
+                    if (leftPressed) {
+                        dx -= spinRate;
+                    }
+                    if (rightPressed) {
+                        dx += spinRate;
+                    }
+                }
+            }
+        }
+
+        function movePaddle() {
+            if (rightPressed) {
+                paddleX = Math.min(paddleX + paddleSpeed, canvas.width - paddleWidth);
+            } else if (leftPressed) {
+                paddleX = Math.max(paddleX - paddleSpeed, 0);
+            }
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            movePaddle()
+            drawPaddle()
+            addSpin()
+            moveBall()
+            drawBall()
+            
+
+        }
+
+        document.addEventListener("keydown", keyDownHandler, false);
+        document.addEventListener("keyup", keyUpHandler, false);
+        const interval = setInterval(draw, 10);
     </script>
   </body>
 </html>
