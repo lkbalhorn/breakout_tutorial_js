@@ -26,6 +26,8 @@
 
         // Game Variables
         let score = 0;
+        enableLives = false;
+        let lives = 3;
 
         // Ball Variables
         let x = canvas.width / 2;
@@ -45,6 +47,7 @@
         // Input Variables
         let rightPressed = false;
         let leftPressed = false;
+        let mouseEnabled = false;
 
         // Brick Variables
         const brickRowCount = 3;
@@ -54,7 +57,7 @@
         const brickPadding = 10;
         const brickOffsetTop = 30;
         const brickOffsetLeft = 30;
-        let breakSpeed = 1.05
+        let breakSpeed = 1.1
 
 
         const bricks = [];
@@ -81,7 +84,15 @@
                 leftPressed = false;
             }
         }
-
+        
+        function mouseMoveHandler(e) {
+            if (mouseEnabled) {
+                const relativeX = e.clientX - canvas.offsetLeft;
+                if (relativeX > 0 && relativeX < canvas.width) {
+                    paddleX = relativeX - paddleWidth / 2;
+                }
+            }
+        }
 
         // Drawing Functions
         function drawBall() {
@@ -125,6 +136,14 @@
             ctx.fillText(`Score: ${score}`, 8, 20);
         }
 
+        function drawLives() {
+            if (enableLives) {
+                ctx.font = "16px Arial";
+                ctx.fillStyle = "#0095DD";
+                ctx.fillText(`Lives: ${lives}`, canvas.width - 65, 20);
+            }
+        }
+
 
         // Gameplay Functions
         function moveBall() {
@@ -140,15 +159,23 @@
                 }
             }
              if (y + dy > canvas.height - ballRadius + graceHeight) {
-                alert("GAME OVER");
-                document.location.reload();
-                clearInterval(interval);
+                 lives--;
+                 if (!lives || !enableLives){
+                     alert("GAME OVER");
+                     document.location.reload();
+                     clearInterval(interval); // Needed for Chrome to end game
+                 } else {
+                     x = canvas.width / 2;
+                     y = canvas.height - 30;
+                     dx = 2;
+                     dy = -2;
+                     // paddleX = (canvas.width - paddleWidth) / 2;
+                 }
             }
             x += dx;
             y += dy;
-
         }
-
+        
         function addSpin() {
             // Check if ball is touching paddle
             if (y + dy > canvas.height - ballRadius - paddleHeight) {
@@ -209,8 +236,10 @@
             moveBall();
             drawBall();
             drawScore();
+            drawLives();
         }
 
+        document.addEventListener("mousemove", mouseMoveHandler, false);
         document.addEventListener("keydown", keyDownHandler, false);
         document.addEventListener("keyup", keyUpHandler, false);
         const interval = setInterval(draw, 10);
