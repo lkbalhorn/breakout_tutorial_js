@@ -57,7 +57,7 @@
         const brickPadding = 10;
         const brickOffsetTop = 30;
         const brickOffsetLeft = 30;
-        let breakSpeed = 1.1
+        let breakSpeed = 1.05
 
 
         const bricks = [];
@@ -70,9 +70,9 @@
 
         // Input Functions
         function keyDownHandler(e) {
-            if (e.key === "Right" || e.key === "ArrowRight") {
+            if (e.key === "Right" || e.key === "ArrowRight" || e.key === 'w') {
                 rightPressed = true;
-            } else if (e.key === "Left" || e.key === "ArrowLeft") {
+            } else if (e.key === "Left" || e.key === "ArrowLeft" || e.key === 'd') {
                 leftPressed = true;
             }
         }
